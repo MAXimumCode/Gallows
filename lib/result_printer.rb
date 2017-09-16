@@ -13,7 +13,7 @@ class ResultPrinter
         @status_image << file.read
         file.close
       else
-        @status_image << "\n [ изображение не найдено ] \n"
+        @status_image << "\n изображение не найдено \n"
       end
       counter += 1
     end
@@ -33,7 +33,7 @@ class ResultPrinter
     if game.status == -1
       puts
       puts "Вы проиграли :("
-      puts "Загаданное слово было: " + game.letters.join("")
+      puts "Загаданное слово: " + game.letters.join("")
       puts
     elsif game.status == 1
       puts
