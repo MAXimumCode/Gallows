@@ -1,6 +1,8 @@
 class Game
+  attr_reader :errors, :letters, :good_letters, :bad_letters, :status
+
   def initialize(slovo)
-    @letters = attr_reader_letters(slovo)
+    @letters = get_letters(slovo)
 
     @errors = 0
 
@@ -10,16 +12,12 @@ class Game
     @status = 0
   end
 
-  def attr_reader_letters(slovo)
+  def get_letters(slovo)
     if slovo == nil || slovo == ""
       abort "Загадано пустое слово"
     end
 
     return slovo.encode('UTF-8').split("")
-  end
-
-  def status
-    return @status
   end
 
   def next_step(bukva)
@@ -47,7 +45,7 @@ class Game
     end
   end
 
-  def attr_reader_next_letter
+  def ask_next_letter
     puts "\nВведите следующую букву"
 
     letter = ""
@@ -56,21 +54,5 @@ class Game
     end
 
     next_step(letter)
-  end
-
-  def errors
-    @errors
-  end
-
-  def letters
-    @letters
-  end
-
-  def good_letters
-    @good_letters
-  end
-
-  def bad_letters
-    @bad_letters
   end
 end

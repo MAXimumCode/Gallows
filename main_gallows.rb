@@ -27,7 +27,7 @@ game = Game.new(word_reader.read_from_file(words_file_name))
 
 while game.status == 0
   printer.print_status(game)
-  game.attr_reader_next_letter
+  game.ask_next_letter
 end
 
 printer.print_status(game)
