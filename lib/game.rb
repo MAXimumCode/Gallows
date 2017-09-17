@@ -1,6 +1,6 @@
 class Game
   def initialize(slovo)
-    @letters = get_letters(slovo)
+    @letters = attr_reader_letters(slovo)
 
     @errors = 0
 
@@ -10,7 +10,7 @@ class Game
     @status = 0
   end
 
-  def get_letters(slovo)
+  def attr_reader_letters(slovo)
     if slovo == nil || slovo == ""
       abort "Загадано пустое слово"
     end
@@ -47,7 +47,7 @@ class Game
     end
   end
 
-  def ask_next_letter
+  def attr_reader_next_letter
     puts "\nВведите следующую букву"
 
     letter = ""
