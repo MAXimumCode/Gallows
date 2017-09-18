@@ -17,7 +17,7 @@ class Game
       abort "Загадано пустое слово"
     end
 
-    return slovo.encode('UTF-8').split("")
+    return slovo.downcase.encode('UTF-8').split("")
   end
 
   def next_step(bukva)
@@ -29,19 +29,41 @@ class Game
       return
     end
 
-    if @letters.include?(bukva)
-      @good_letters << bukva
+    if letters.include?(bukva) ||
+      (bukva == "е" && letters.include?("ё")) ||
+      (bukva == "ё" && letters.include?("е")) ||
+      (bukva == "и" && letters.include?("й")) ||
+      (bukva == "й" && letters.include?("и"))
 
-      if @good_letters.uniq.sort == @letters.uniq.sort
+      good_letters << bukva
+
+      if bukva == "е"
+        good_letters << "ё"
+      end
+
+      if bukva == "ё"
+        good_letters << "е"
+      end
+
+      if bukva == "и"
+        good_letters << "й"
+      end
+
+      if bukva == "й"
+        good_letters << "и"
+      end
+
+      if (letters - good_letters).empty?
         @status = 1
       end
+
     else
       @bad_letters << bukva
       @errors += 1
 
-      if @errors >= 7
-        @status = -1
-      end
+        if @errors >= 7
+          @status = -1
+        end
     end
   end
 
@@ -49,8 +71,9 @@ class Game
     puts "\nВведите следующую букву"
 
     letter = ""
+
     while letter == ""
-      letter = STDIN.gets.encode("UTF-8").chomp
+      letter = STDIN.gets.encode("UTF-8").chomp.downcase
     end
 
     next_step(letter)
