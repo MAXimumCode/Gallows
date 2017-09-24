@@ -1,5 +1,9 @@
 class Game
-  attr_reader :errors, :letters, :good_letters, :bad_letters, :status
+  attr_reader :errors, :letters, :good_letters, :bad_letters
+
+  attr_accessor :version, :status
+
+  MAX_ERRORS = 7
 
   def initialize(slovo)
     @letters = get_letters(slovo)
@@ -9,7 +13,7 @@ class Game
     @good_letters = []
     @bad_letters = []
 
-    @status = 0
+    @status = :in_progress # :won, :lost
   end
 
   def get_letters(slovo)
@@ -17,7 +21,7 @@ class Game
       abort "Загадано пустое слово"
     end
 
-    return slovo.downcase.encode('UTF-8').split("")
+    slovo.downcase.encode('UTF-8').split("")
   end
 
   def ask_next_letter
@@ -32,48 +36,73 @@ class Game
     next_step(letter)
   end
 
-  def next_step(bukva)
-    if @status == -1 || @status == 1
-      return
+  def solved?
+    (@letters - @good_letters).empty?
+  end
+
+  def repeated?(letter)
+    @good_letters.include?(letter) || @bad_letters.include?(letter)
+  end
+
+  def lost?
+    @status == :lost || @errors >= MAX_ERRORS
+  end
+
+  def in_progress?
+    @status == :in_progress
+  end
+
+  def max_errors
+    MAX_ERRORS
+  end
+
+  def errors_left
+    MAX_ERRORS - @errors
+  end
+
+  def won?
+    @status == :won
+  end
+
+  def is_good?(letter)
+    letters.include?(letter) ||
+      (letter == "е" && letters.include?("ё")) ||
+      (letter == "ё" && letters.include?("е")) ||
+      (letter == "и" && letters.include?("й")) ||
+      (letter == "й" && letters.include?("и"))
+  end
+
+  def add_letter_to(letters, letter)
+    letters << letter
+
+    case letter
+      when "е" then
+        letters << "ё"
+      when "ё" then
+        letters << "е"
+      when "и" then
+        letters << "й"
+      when "й" then
+        letters << "и"
     end
+  end
 
-    if @good_letters.include?(bukva) || @bad_letters.include?(bukva)
-      return
-    end
+  def next_step(letter)
 
-    if letters.include?(bukva) ||
-      (bukva == "е" && letters.include?("ё")) ||
-      (bukva == "ё" && letters.include?("е")) ||
-      (bukva == "и" && letters.include?("й")) ||
-      (bukva == "й" && letters.include?("и"))
+    return if @status == :lost || @status == :won
+    return if repeated?(letter)
 
-      good_letters << bukva
+    if is_good?(letter)
+      add_letter_to(@good_letters, letter)
 
-      case bukva
-        when "е" then good_letters << "ё"
-        when "ё" then good_letters << "е"
-        when "и" then good_letters << "й"
-        when "й" then good_letters << "и"
-      end
-      
-      if (letters - good_letters).empty?
-        @status = 1
-      end
+      self.status = :won if solved?
 
     else
-      case bukva
-        when "е" then bad_letters << "ё"
-        when "ё" then bad_letters << "е"
-        when "и" then bad_letters << "й"
-        when "й" then bad_letters << "и"
-      end
+      add_letter_to(@bad_letters, letter)
 
-      @bad_letters << bukva
       @errors += 1
 
-      if @errors >= 7
-        @status = -1
-      end
+      @status = :lost if lost?
     end
   end
 end
